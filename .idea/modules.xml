@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/ZhiGua.iml" filepath="$PROJECT_DIR$/ZhiGua.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jqprinter/jqprinter.iml" filepath="$PROJECT_DIR$/jqprinter/jqprinter.iml" />
+    </modules>
+  </component>
+</project>
