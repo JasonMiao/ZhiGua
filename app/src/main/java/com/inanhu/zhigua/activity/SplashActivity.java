@@ -21,8 +21,8 @@ public class SplashActivity extends BaseActivity {
             @Override
             public void run() {
                 // ？可以把登录的html放在本地，这样跳转到WebPageActivity界面就比较顺畅
-                startActivity(new Intent(SplashActivity.this, WebPageActivity.class).putExtra(Constant.Key.START_URL, Constant.START_URL));
-//                startActivity(new Intent(SplashActivity.this, PrintActivity.class));
+//                startActivity(new Intent(SplashActivity.this, WebPageActivity.class).putExtra(Constant.Key.START_URL, Constant.START_URL));
+                startActivity(new Intent(SplashActivity.this, PrintActivity.class));
                 finish();
             }
         }, 3000);

@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="Encoding">
+  <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://$PROJECT_DIR$/jqprinter/src/main/java/com/jq/printer/JQPrinter.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/jqprinter/src/main/java/com/jq/printer/JQPrinterInfo.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/jqprinter/src/main/java/com/jq/printer/common/Code128.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/jqprinter/src/main/java/com/jq/printer/common/ImageConvert.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/jqprinter/src/main/java/com/jq/printer/esc/Barcode.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/jqprinter/src/main/java/com/jq/printer/esc/BaseESC.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/jqprinter/src/main/java/com/jq/printer/esc/CardReader.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/jqprinter/src/main/java/com/jq/printer/esc/ESC.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/jqprinter/src/main/java/com/jq/printer/esc/Graphic.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/jqprinter/src/main/java/com/jq/printer/esc/Image.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/jqprinter/src/main/java/com/jq/printer/esc/Text.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/jqprinter/src/main/java/com/jq/printer/jpl/Barcode.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/jqprinter/src/main/java/com/jq/printer/jpl/BaseJPL.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/jqprinter/src/main/java/com/jq/printer/jpl/Graphic.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/jqprinter/src/main/java/com/jq/printer/jpl/Image.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/jqprinter/src/main/java/com/jq/printer/jpl/JPL.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/jqprinter/src/main/java/com/jq/printer/jpl/Page.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/jqprinter/src/main/java/com/jq/printer/jpl/Text.java" charset="GBK" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

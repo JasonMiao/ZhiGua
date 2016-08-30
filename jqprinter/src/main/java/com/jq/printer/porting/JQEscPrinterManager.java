@@ -75,6 +75,16 @@ public class JQEscPrinterManager {
     }
 
     /**
+     * 唤醒打印机
+     * 注意:部分手持蓝牙连接第一次不稳定，会造成开头字符乱码，可以通常这个方法来避免此问题
+     *
+     * @return
+     */
+    public boolean wakeUp(){
+        return printer.wakeUp();
+    }
+
+    /**
      * 打印机状态是否正常
      *
      * @return

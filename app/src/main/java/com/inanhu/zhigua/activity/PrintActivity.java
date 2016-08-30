@@ -21,8 +21,10 @@ import com.inanhu.zhigua.base.GlobalValue;
 import com.inanhu.zhigua.util.LogUtil;
 import com.inanhu.zhigua.util.ToastUtil;
 import com.jq.printer.JQPrinter;
+import com.jq.printer.esc.ESC;
 import com.jq.printer.jpl.JPL;
 import com.jq.printer.jpl.Text;
+import com.jq.printer.porting.JQEscPrinterManager;
 import com.jq.printer.porting.PrinterManager;
 
 import org.json.simple.JSONArray;
@@ -36,7 +38,8 @@ public class PrintActivity extends BaseActivity implements View.OnClickListener 
 
     Button btnPrint, btnConnect, btnDisconnect;
     private BluetoothAdapter btAdapter = null;
-    private PrinterManager printer = new PrinterManager();
+//    private PrinterManager printer = new PrinterManager();
+    private JQEscPrinterManager printer = new JQEscPrinterManager();
 
     private final static int REQUEST_BT_ENABLE = 0;
     private final static int REQUEST_BT_ADDR = 1;
@@ -68,101 +71,110 @@ public class PrintActivity extends BaseActivity implements View.OnClickListener 
         }
     }
 
-    private void print(JSONObject printData) {
-        String empName = (String) printData.get("empName");
-        String customerName = (String) printData.get("customerName");
-        // 总金额(欠款+本单金额)
-        Double billAmount = (Double) printData.get("billAmount");
-        // 订单总金额
-        Double receivablePay = (Double) printData.get("receivablePay");
-        // 优惠支付
-        Double discountPay = (Double) printData.get("discountPay");
-        // 实收
-        Double actualPayment = (Double) printData.get("actualPayment");
-        String createTime = (String) printData.get("createTime");
+    private void print(/*JSONObject printData*/) {
+//        String empName = (String) printData.get("empName");
+//        String customerName = (String) printData.get("customerName");
+//        // 总金额(欠款+本单金额)
+//        Double billAmount = (Double) printData.get("billAmount");
+//        // 订单总金额
+//        Double receivablePay = (Double) printData.get("receivablePay");
+//        // 优惠支付
+//        Double discountPay = (Double) printData.get("discountPay");
+//        // 实收
+//        Double actualPayment = (Double) printData.get("actualPayment");
+//        String createTime = (String) printData.get("createTime");
 
-        String ret = printer.isPrinterOk();
-        if ("00".equals(ret)) {
-            printer.pageStart();
-//                            printer.printBitmap(0, 0, PrintActivity.this.getResources(), R.mipmap.logo, Image.IMAGE_ROTATE.ANGLE_0);
-            // ??64号字体有问题？？？
-            printer.printText(JQPrinter.ALIGN.CENTER, 8, "WALMART", 48, true, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-            printer.printText(JQPrinter.ALIGN.CENTER, 76, "沃 尔 玛", 32, true, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-
-            printer.printLine(new Point(8, 136), new Point(568, 136), 3);
-
-            printer.printText(28, 156, "客户", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-            printer.printText(28, 196, customerName, 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-
-            printer.printText(178, 156, "开单员", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-            printer.printText(178, 196, empName, 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//        String ret = printer.isPrinterOk();
+//        if ("00".equals(ret)) {
+        if (printer.wakeUp()){
+            printer.printText("测试");
+            printer.printText(JQPrinter.ALIGN.RIGHT, ESC.FONT_HEIGHT.x64, true, ESC.TEXT_ENLARGE.NORMAL, "测试");
+            printer.feedLines(3);
+            printer.printText(JQPrinter.ALIGN.CENTER, ESC.FONT_HEIGHT.x64, true, ESC.TEXT_ENLARGE.NORMAL, "测试");
+            printer.feedEnter();
+            printer.printText(JQPrinter.ALIGN.LEFT, ESC.FONT_HEIGHT.x64, true, ESC.TEXT_ENLARGE.NORMAL, "测试");
 
 
-            printer.printText(378, 156, "开单时间", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-            printer.printText(328, 196, createTime, 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-
-            printer.printLine(new Point(8, 232), new Point(568, 232), 1);
-
-            printer.printText(28, 252, "总金额：", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-            printer.printText(118, 252, String.format("%.1f", billAmount), 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-
-            printer.printText(28, 292, "订单总金额：", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-            printer.printText(168, 292, String.format("%.1f", receivablePay), 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-
-            printer.printText(308, 292, "优惠金额：", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-            printer.printText(428, 292, String.format("%.1f", discountPay), 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-
-            printer.printLine(new Point(8, 332), new Point(568, 332), 3);
-
-            printer.printText(38, 352, "商品名称", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-            printer.printText(248, 352, "单价", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-            printer.printText(360, 352, "数量", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-            printer.printText(460, 352, "合计", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-
-            int height = 392;
-            int step = 40;
-            JSONArray goodsJson = (JSONArray) printData.get("goods");
-            for (int i = 0; i < goodsJson.size(); i++) {
-                JSONObject goods = (JSONObject) goodsJson.get(i);
-                String commodityName = (String) goods.get("commodityName");
-                Double price = (Double) goods.get("price");
-                Long count = (Long) goods.get("count");
-                Double total = (Double) goods.get("total");
-                height += step * i;
-                printer.printText(38, height, commodityName, 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-                printer.printText(248, height, String.format("%.1f", price), 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-                printer.printText(372, height, String.valueOf(count), 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-                printer.printText(460, height, String.format("%.1f", total), 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-            }
-
-            height += 40;
-            printer.printLine(new Point(8, height), new Point(568, height), 3);
-            height += 20;
-            printer.printText(28, height, "实收：", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-            printer.printText(98, height, String.format("%.1f", actualPayment), 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-
-            printer.pageEnd();
-            new AsyncTask<Void, Void, Boolean>() {
-
-                @Override
-                protected Boolean doInBackground(Void... params) {
-                    boolean result = printer.print();
-                    printer.feedMarkEnd(0);
-                    return result;
-                }
-
-                @Override
-                protected void onPostExecute(Boolean success) {
-                    if (success) {
-                        ToastUtil.showToast("打印成功");
-                    } else {
-                        ToastUtil.showToast("打印失败");
-                    }
-                }
-            }.execute();
-        } else {
+//            printer.pageStart();
+////                            printer.printBitmap(0, 0, PrintActivity.this.getResources(), R.mipmap.logo, Image.IMAGE_ROTATE.ANGLE_0);
+//            // ??64号字体有问题？？？
+//            printer.printText(JQPrinter.ALIGN.CENTER, 8, "WALMART", 48, true, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//            printer.printText(JQPrinter.ALIGN.CENTER, 76, "沃 尔 玛", 32, true, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//
+//            printer.printLine(new Point(8, 136), new Point(568, 136), 3);
+//
+//            printer.printText(28, 156, "客户", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//            printer.printText(28, 196, customerName, 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//
+//            printer.printText(178, 156, "开单员", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//            printer.printText(178, 196, empName, 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//
+//
+//            printer.printText(378, 156, "开单时间", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//            printer.printText(328, 196, createTime, 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//
+//            printer.printLine(new Point(8, 232), new Point(568, 232), 1);
+//
+//            printer.printText(28, 252, "总金额：", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//            printer.printText(118, 252, String.format("%.1f", billAmount), 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//
+//            printer.printText(28, 292, "订单总金额：", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//            printer.printText(168, 292, String.format("%.1f", receivablePay), 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//
+//            printer.printText(308, 292, "优惠金额：", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//            printer.printText(428, 292, String.format("%.1f", discountPay), 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//
+//            printer.printLine(new Point(8, 332), new Point(568, 332), 3);
+//
+//            printer.printText(38, 352, "商品名称", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//            printer.printText(248, 352, "单价", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//            printer.printText(360, 352, "数量", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//            printer.printText(460, 352, "合计", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//
+//            int height = 392;
+//            int step = 40;
+//            JSONArray goodsJson = (JSONArray) printData.get("goods");
+//            for (int i = 0; i < goodsJson.size(); i++) {
+//                JSONObject goods = (JSONObject) goodsJson.get(i);
+//                String commodityName = (String) goods.get("commodityName");
+//                Double price = (Double) goods.get("price");
+//                Long count = (Long) goods.get("count");
+//                Double total = (Double) goods.get("total");
+//                height += step * i;
+//                printer.printText(38, height, commodityName, 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//                printer.printText(248, height, String.format("%.1f", price), 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//                printer.printText(372, height, String.valueOf(count), 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//                printer.printText(460, height, String.format("%.1f", total), 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//            }
+//
+//            height += 40;
+//            printer.printLine(new Point(8, height), new Point(568, height), 3);
+//            height += 20;
+//            printer.printText(28, height, "实收：", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//            printer.printText(98, height, String.format("%.1f", actualPayment), 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//
+//            printer.pageEnd();
+//            new AsyncTask<Void, Void, Boolean>() {
+//
+//                @Override
+//                protected Boolean doInBackground(Void... params) {
+//                    boolean result = printer.print();
+//                    printer.feedMarkEnd(0);
+//                    return result;
+//                }
+//
+//                @Override
+//                protected void onPostExecute(Boolean success) {
+//                    if (success) {
+//                        ToastUtil.showToast("打印成功");
+//                    } else {
+//                        ToastUtil.showToast("打印失败");
+//                    }
+//                }
+//            }.execute();
+        } /*else {
             ToastUtil.showToast(ErrorResult.getError(ret));
-        }
+        }*/
     }
 
     private void initBluetooth() {
@@ -222,9 +234,10 @@ public class PrintActivity extends BaseActivity implements View.OnClickListener 
                 startActivityForResult(new Intent(PrintActivity.this, BtConfigActivity.class), REQUEST_BT_ADDR);
                 break;
             case R.id.btn_print:
-                String ret = printer.isPrinterOk();
-                ToastUtil.showToast(ErrorResult.getError(ret));
+//                String ret = printer.isPrinterOk();
+//                ToastUtil.showToast(ErrorResult.getError(ret));
 //                print(printData);
+                print();
                 break;
         }
     }
