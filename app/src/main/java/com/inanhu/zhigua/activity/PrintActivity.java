@@ -222,8 +222,9 @@ public class PrintActivity extends BaseActivity implements View.OnClickListener 
                 startActivityForResult(new Intent(PrintActivity.this, BtConfigActivity.class), REQUEST_BT_ADDR);
                 break;
             case R.id.btn_print:
-                ToastUtil.showToast("打印机状态: " + printer.isPrinterOk());
-                print(printData);
+                String ret = printer.isPrinterOk();
+                ToastUtil.showToast(ErrorResult.getError(ret));
+//                print(printData);
                 break;
         }
     }
