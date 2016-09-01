@@ -170,6 +170,10 @@ public class JQEscPrinterManager {
         return printer.esc.text.drawOut(x, y, text);
     }
 
+    public boolean printText(int x, int y, ESC.FONT_HEIGHT height,boolean bold, ESC.TEXT_ENLARGE enlarge, String text){
+        return printer.esc.text.printOut(x, y, height, bold, enlarge, text);
+    }
+
     /**
      * 打印文字
      *

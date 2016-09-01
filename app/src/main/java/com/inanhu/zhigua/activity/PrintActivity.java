@@ -31,6 +31,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import java.text.SimpleDateFormat;
+
 /**
  * Created by iNanHu on 2016/7/17.
  */
@@ -38,7 +40,7 @@ public class PrintActivity extends BaseActivity implements View.OnClickListener 
 
     Button btnPrint, btnConnect, btnDisconnect;
     private BluetoothAdapter btAdapter = null;
-//    private PrinterManager printer = new PrinterManager();
+    //    private PrinterManager printer = new PrinterManager();
     private JQEscPrinterManager printer = new JQEscPrinterManager();
 
     private final static int REQUEST_BT_ENABLE = 0;
@@ -86,53 +88,50 @@ public class PrintActivity extends BaseActivity implements View.OnClickListener 
 
 //        String ret = printer.isPrinterOk();
 //        if ("00".equals(ret)) {
-        if (printer.wakeUp()){
-            printer.printText("测试");
-            printer.printText(JQPrinter.ALIGN.RIGHT, ESC.FONT_HEIGHT.x64, true, ESC.TEXT_ENLARGE.NORMAL, "测试");
-            printer.feedLines(3);
-            printer.printText(JQPrinter.ALIGN.CENTER, ESC.FONT_HEIGHT.x64, true, ESC.TEXT_ENLARGE.NORMAL, "测试");
+
+        if (printer.wakeUp()) {
+            // 标题
+            printer.printText(JQPrinter.ALIGN.CENTER, ESC.FONT_HEIGHT.x64, true, ESC.TEXT_ENLARGE.HEIGHT_DOUBLE, "智瓜科技");
+            ESC.LINE_POINT[] lines = new ESC.LINE_POINT[1];
+            lines[0] = new ESC.LINE_POINT(0, 575);
+            for (int i = 0; i < 4; i++) {
+                printer.printLine(lines);
+            }
+            printer.feedDots(4);
+
+            // 摘要
+//            printer.printText(JQPrinter.ALIGN.LEFT, false, "客户：" + customerName + "  ");
+//            printer.printText("开单员：" + empName + " ");
+//            printer.printText("开单时间：" + createTime + " ");
+//            printer.feedDots(4);
+//            printer.printText(JQPrinter.ALIGN.LEFT, false, "总金额：" + String.format("%.1f", billAmount) + "  ");
+//            printer.printText("订单总金额：" + String.format("%.1f", receivablePay) + " ");
+//            printer.printText("优惠金额：" + String.format("%.1f", discountPay) + " ");
+//            printer.feedDots(4);
+//            for (int i = 0; i < 4; i++) {
+//                printer.printLine(lines);
+//            }
+//            printer.feedDots(4);
+
+            printer.printText(JQPrinter.ALIGN.LEFT, false, "客户：" + "李白" + "  ");
+            printer.printText("开单员：" + "冯智华" + " ");
+            printer.printText("开单时间：" + "2016-09-01 11:06:03" + " ");
+            printer.feedDots(4);
+            printer.printText(JQPrinter.ALIGN.LEFT, false, "总金额：" + "470.00" + "  ");
+            printer.printText("订单总金额：" + "350.00" + " ");
+            printer.printText("优惠金额：" + "0.00" + " ");
+            printer.feedDots(4);
+            for (int i = 0; i < 4; i++) {
+                printer.printLine(lines);
+            }
+            printer.feedDots(4);
+
+            // 订单列表
+            printer.printText(0, 0, "商品名称");
+            printer.printText(200, 0, "单价");
+            printer.printText(325, 0, "数量");
+            printer.printText(450, 0, "合计");
             printer.feedEnter();
-            printer.printText(JQPrinter.ALIGN.LEFT, ESC.FONT_HEIGHT.x64, true, ESC.TEXT_ENLARGE.NORMAL, "测试");
-
-
-//            printer.pageStart();
-////                            printer.printBitmap(0, 0, PrintActivity.this.getResources(), R.mipmap.logo, Image.IMAGE_ROTATE.ANGLE_0);
-//            // ??64号字体有问题？？？
-//            printer.printText(JQPrinter.ALIGN.CENTER, 8, "WALMART", 48, true, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//            printer.printText(JQPrinter.ALIGN.CENTER, 76, "沃 尔 玛", 32, true, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//
-//            printer.printLine(new Point(8, 136), new Point(568, 136), 3);
-//
-//            printer.printText(28, 156, "客户", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//            printer.printText(28, 196, customerName, 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//
-//            printer.printText(178, 156, "开单员", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//            printer.printText(178, 196, empName, 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//
-//
-//            printer.printText(378, 156, "开单时间", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//            printer.printText(328, 196, createTime, 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//
-//            printer.printLine(new Point(8, 232), new Point(568, 232), 1);
-//
-//            printer.printText(28, 252, "总金额：", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//            printer.printText(118, 252, String.format("%.1f", billAmount), 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//
-//            printer.printText(28, 292, "订单总金额：", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//            printer.printText(168, 292, String.format("%.1f", receivablePay), 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//
-//            printer.printText(308, 292, "优惠金额：", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//            printer.printText(428, 292, String.format("%.1f", discountPay), 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//
-//            printer.printLine(new Point(8, 332), new Point(568, 332), 3);
-//
-//            printer.printText(38, 352, "商品名称", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//            printer.printText(248, 352, "单价", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//            printer.printText(360, 352, "数量", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//            printer.printText(460, 352, "合计", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//
-//            int height = 392;
-//            int step = 40;
 //            JSONArray goodsJson = (JSONArray) printData.get("goods");
 //            for (int i = 0; i < goodsJson.size(); i++) {
 //                JSONObject goods = (JSONObject) goodsJson.get(i);
@@ -140,41 +139,48 @@ public class PrintActivity extends BaseActivity implements View.OnClickListener 
 //                Double price = (Double) goods.get("price");
 //                Long count = (Long) goods.get("count");
 //                Double total = (Double) goods.get("total");
-//                height += step * i;
-//                printer.printText(38, height, commodityName, 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//                printer.printText(248, height, String.format("%.1f", price), 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//                printer.printText(372, height, String.valueOf(count), 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//                printer.printText(460, height, String.format("%.1f", total), 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
+//                printer.printText(0, 0, commodityName);
+//                printer.printText(200, 0, String.format("%.1f", price));
+//                printer.printText(325, 0, String.valueOf(count));
+//                printer.printText(450, 0, String.format("%.1f", total));
+//                printer.feedEnter();
 //            }
-//
-//            height += 40;
-//            printer.printLine(new Point(8, height), new Point(568, height), 3);
-//            height += 20;
-//            printer.printText(28, height, "实收：", 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//            printer.printText(98, height, String.format("%.1f", actualPayment), 24, false, false, false, false, Text.TEXT_ENLARGE.x1, Text.TEXT_ENLARGE.x1, JPL.ROTATE.ROTATE_0);
-//
-//            printer.pageEnd();
-//            new AsyncTask<Void, Void, Boolean>() {
-//
-//                @Override
-//                protected Boolean doInBackground(Void... params) {
-//                    boolean result = printer.print();
-//                    printer.feedMarkEnd(0);
-//                    return result;
-//                }
-//
-//                @Override
-//                protected void onPostExecute(Boolean success) {
-//                    if (success) {
-//                        ToastUtil.showToast("打印成功");
-//                    } else {
-//                        ToastUtil.showToast("打印失败");
-//                    }
-//                }
-//            }.execute();
-        } /*else {
-            ToastUtil.showToast(ErrorResult.getError(ret));
-        }*/
+//            for (int i = 0; i < 4; i++) {
+//                printer.printLine(lines);
+//            }
+//            printer.feedDots(4);
+//            // 实收金额
+//            printer.printText("实收：" + String.format("%.1f", actualPayment));
+//            printer.feedLines(2);
+
+
+            printer.printText(0, 0, "金仕达");
+            printer.printText(200, 0, "20.0");
+            printer.printText(325, 0, "2");
+            printer.printText(450, 0, "40.0");
+            printer.feedEnter();
+            printer.printText(0, 0, "金仕达");
+            printer.printText(200, 0, "20.0");
+            printer.printText(325, 0, "2");
+            printer.printText(450, 0, "40.0");
+            printer.feedEnter();
+            printer.printText(0, 0, "金仕达");
+            printer.printText(200, 0, "20.0");
+            printer.printText(325, 0, "2");
+            printer.printText(450, 0, "40.0");
+            printer.feedEnter();
+            for (int i = 0; i < 4; i++) {
+                printer.printLine(lines);
+            }
+            printer.feedDots(4);
+            // 实收金额
+            printer.printText("实收：" + "350.00");
+            printer.feedLines(2);
+
+
+        } else {
+            ToastUtil.showToast("设备未唤醒");
+        }
     }
 
     private void initBluetooth() {
