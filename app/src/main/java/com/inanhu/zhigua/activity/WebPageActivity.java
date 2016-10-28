@@ -1,19 +1,28 @@
 package com.inanhu.zhigua.activity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 
+import com.inanhu.zhigua.base.Constant;
+import com.inanhu.zhigua.base.ZhiGuaApp;
 import com.inanhu.zhigua.util.LogUtil;
 import com.inanhu.zhigua.util.ToastUtil;
 import com.inanhu.zhigua.widget.CustomProgress;
 import com.uzmap.pkg.openapi.ExternalActivity;
 import com.uzmap.pkg.openapi.WebViewProvider;
 
+import printer.porting.JQEscPrinterManager;
+
 /**
  * Created by iNanHu on 2016/7/16.
  */
 public class WebPageActivity extends ExternalActivity {
+
+    private JQEscPrinterManager printer;
 
     private static final String TAG = WebPageActivity.class.getSimpleName();
 
@@ -34,27 +43,28 @@ public class WebPageActivity extends ExternalActivity {
 
     @Override
     protected boolean shouldOverrideUrlLoading(WebViewProvider provider, String url) {
-//        if(url.contains("taobao")){
-//            return true;
-//        }
-        ToastUtil.showToast(url);
+        LogUtil.e(TAG, "url:" + url);
+        if (Constant.PRINTER_LINK_URL.equals(url)) {
+            startActivity(new Intent(WebPageActivity.this, BtConfigActivity.class));
+            return true;
+        }
         return false;
     }
 
     @Override
     protected void onPageStarted(WebViewProvider provider, String url, Bitmap favicon) {
-        //远程Url，加载较慢
-        if (url.startsWith("http")) {
-            showProgressDialog("");
-        }
+//        //远程Url，加载较慢
+//        if (url.startsWith("http")) {
+//            showProgressDialog("");
+//        }
     }
 
     @Override
     protected void onPageFinished(WebViewProvider provider, String url) {
-        //远程Url，加载较慢
-        if (url.startsWith("http")) {
-            closeProgressDialog();
-        }
+//        //远程Url，加载较慢
+//        if (url.startsWith("http")) {
+//            closeProgressDialog();
+//        }
     }
 
     /**
@@ -83,7 +93,17 @@ public class WebPageActivity extends ExternalActivity {
         long secondTime = System.currentTimeMillis();
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (secondTime - firstTime < 2000) {
-                finish();
+                // 清除缓存
+                CookieManager.getInstance().removeAllCookie();
+                printer = ZhiGuaApp.getPrinter();
+                if (printer != null && printer.isPrinterOpened()) {
+                    if (printer.close()) {
+                        JQEscPrinterManager.printerOffline();
+                        finish();
+                    }
+                } else {
+                    finish();
+                }
             } else {
                 ToastUtil.showToast("再按一次退出");
                 firstTime = System.currentTimeMillis();
@@ -92,4 +112,5 @@ public class WebPageActivity extends ExternalActivity {
         }
         return super.onKeyDown(keyCode, event);
     }
+
 }

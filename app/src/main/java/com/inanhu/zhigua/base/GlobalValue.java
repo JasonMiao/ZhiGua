@@ -35,6 +35,22 @@ public final class GlobalValue {
         }
     }
 
+    /**
+     * 删除指定key的全局变量
+     *
+     * @param key
+     */
+    public boolean deleteGlobal(String key) {
+        if (hashGlobal.containsKey(key)) {
+            hashGlobal.remove(key);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 清除全局变量
+     */
     public void clearGlobal() {
         hashGlobal.clear();
     }

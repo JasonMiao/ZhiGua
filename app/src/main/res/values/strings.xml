@@ -1,4 +1,9 @@
 <resources>
-    <string name="app_name">ZhiGua</string>
+    <string name="app_name">智瓜</string>
     <string name="unknown_device">未知设备</string>
+    <string name="login">登录</string>
+    <string name="register">注册</string>
+    <string name="forget_pwd">忘记密码？</string>
+    <string name="hint_input_username">请输入用户名</string>
+    <string name="hint_input_pwd">请输入密码</string>
 </resources>

@@ -1,3 +1,4 @@
+/*
 package com.inanhu.zhigua.activity;
 
 import android.app.Activity;
@@ -6,7 +7,8 @@ import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Point;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -20,22 +22,14 @@ import com.inanhu.zhigua.base.ErrorResult;
 import com.inanhu.zhigua.base.GlobalValue;
 import com.inanhu.zhigua.util.LogUtil;
 import com.inanhu.zhigua.util.ToastUtil;
-import com.jq.printer.JQPrinter;
-import com.jq.printer.esc.ESC;
-import com.jq.printer.jpl.JPL;
-import com.jq.printer.jpl.Text;
-import com.jq.printer.porting.JQEscPrinterManager;
-import com.jq.printer.porting.PrinterManager;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import java.text.SimpleDateFormat;
-
-/**
+*
  * Created by iNanHu on 2016/7/17.
- */
+
+
 public class PrintActivity extends BaseActivity implements View.OnClickListener {
 
     Button btnPrint, btnConnect, btnDisconnect;
@@ -57,7 +51,7 @@ public class PrintActivity extends BaseActivity implements View.OnClickListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_print);
         initView();
-        initData();
+//        initData();
         initBluetooth();
     }
 
@@ -73,7 +67,9 @@ public class PrintActivity extends BaseActivity implements View.OnClickListener 
         }
     }
 
-    private void print(/*JSONObject printData*/) {
+    private void print(
+JSONObject printData
+) {
 //        String empName = (String) printData.get("empName");
 //        String customerName = (String) printData.get("customerName");
 //        // 总金额(欠款+本单金额)
@@ -127,11 +123,6 @@ public class PrintActivity extends BaseActivity implements View.OnClickListener 
             printer.feedDots(4);
 
             // 订单列表
-            printer.printText(0, 0, "商品名称");
-            printer.printText(200, 0, "单价");
-            printer.printText(325, 0, "数量");
-            printer.printText(450, 0, "合计");
-            printer.feedEnter();
 //            JSONArray goodsJson = (JSONArray) printData.get("goods");
 //            for (int i = 0; i < goodsJson.size(); i++) {
 //                JSONObject goods = (JSONObject) goodsJson.get(i);
@@ -152,6 +143,12 @@ public class PrintActivity extends BaseActivity implements View.OnClickListener 
 //            // 实收金额
 //            printer.printText("实收：" + String.format("%.1f", actualPayment));
 //            printer.feedLines(2);
+
+            printer.printText(0, 0, "商品名称");
+            printer.printText(200, 0, "单价");
+            printer.printText(325, 0, "数量");
+            printer.printText(450, 0, "合计");
+            printer.feedEnter();
 
 
             printer.printText(0, 0, "金仕达");
@@ -177,7 +174,9 @@ public class PrintActivity extends BaseActivity implements View.OnClickListener 
             printer.printText("实收：" + "350.00");
             printer.feedLines(2);
 
-
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.qr_);
+            printer.printImage(0, bitmap, 0, 50);
+            printer.feedLines(2);
         } else {
             ToastUtil.showToast("设备未唤醒");
         }
@@ -306,12 +305,13 @@ public class PrintActivity extends BaseActivity implements View.OnClickListener 
 
     @Override
     protected void onDestroy() {
-        if (printer != null && printer.isPrinterOpened()) {
-            if (printer.close()) {
-                ToastUtil.showToast("断开打印机成功");
-            }
-        }
-        unregisterReceiver(mReceiver);
+//        if (printer != null && printer.isPrinterOpened()) {
+//            if (printer.close()) {
+//                ToastUtil.showToast("断开打印机成功");
+//            }
+//        }
+//        unregisterReceiver(mReceiver);
         super.onDestroy();
     }
 }
+*/

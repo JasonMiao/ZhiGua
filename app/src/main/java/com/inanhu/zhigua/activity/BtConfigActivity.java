@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,15 +19,19 @@ import com.inanhu.zhigua.R;
 import com.inanhu.zhigua.adapter.DeviceInfoAdapter;
 import com.inanhu.zhigua.base.BaseActivity;
 import com.inanhu.zhigua.base.Constant;
+import com.inanhu.zhigua.base.ErrorResult;
 import com.inanhu.zhigua.base.GlobalValue;
+import com.inanhu.zhigua.service.PrintService;
 import com.inanhu.zhigua.util.LogUtil;
 import com.inanhu.zhigua.util.ToastUtil;
 import com.inanhu.zhigua.widget.DividerItemDecoration;
+import com.uzmap.pkg.uzkit.request.APICloudHttpClient;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.bingoogolapple.androidcommon.adapter.BGAOnRVItemClickListener;
+import printer.porting.JQEscPrinterManager;
 
 /**
  * 蓝牙连接界面
@@ -35,10 +40,18 @@ import cn.bingoogolapple.androidcommon.adapter.BGAOnRVItemClickListener;
  */
 public class BtConfigActivity extends BaseActivity implements BGAOnRVItemClickListener {
 
-    public static final String EXTRA_BLUETOOTH_DEVICE_ADDRESS = "Bluetooth Device Adrress";
-    public static final String EXTRA_BLUETOOTH_DEVICE_NAME = "Bluetooth Device Name";
+    public static final String BLUETOOTH_DEVICE_ADDRESS = "Bluetooth Device Adrress";
+    public static final String BLUETOOTH_DEVICE_NAME = "Bluetooth Device Name";
+
+//    // 济强打印机对象
+//    private JQEscPrinterManager printer = new JQEscPrinterManager();
 
     BluetoothAdapter btAdapter = null;
+    // 蓝牙是否可用
+    private boolean isBtOk = true;
+    private String btName, btAddress;
+    // 是否静默打开蓝牙
+    private boolean mBtOpenSilent = true;
     private String mNameFilter = Constant.DEFAULT_NAME_FILTER;
     private DeviceInfoAdapter mAdapter;
     private RecyclerView recyclerView;
@@ -50,8 +63,9 @@ public class BtConfigActivity extends BaseActivity implements BGAOnRVItemClickLi
         setContentView(R.layout.activity_btconfig);
 
 		// 设定默认返回值为取消
-		setResult(Activity.RESULT_CANCELED);
+//		setResult(Activity.RESULT_CANCELED);
         initView();
+        initBluetooth();
 
         RegisterReceiver();
         startScan();
@@ -60,6 +74,18 @@ public class BtConfigActivity extends BaseActivity implements BGAOnRVItemClickLi
     private void initView() {
         showTopBarBack(true);
         setTopBarTitle("设备连接");
+        setTopBarRight("断开");
+        findViewById(R.id.id_topbar_right).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (printer != null && printer.isPrinterOpened()) {
+                    if (printer.close()) {
+                        ToastUtil.showToast("断开打印机成功");
+                        finish();
+                    }
+                }
+            }
+        });
 
         recyclerView = (RecyclerView) findViewById(R.id.list_bluetooth);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -69,8 +95,39 @@ public class BtConfigActivity extends BaseActivity implements BGAOnRVItemClickLi
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
     }
 
+    private void initBluetooth() {
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (btAdapter == null) {
+            ToastUtil.showToast("本机没有找到蓝牙硬件或驱动！");
+            // TODO 处理设备不带蓝牙的情况
+            isBtOk = false;
+            return;
+        } else {
+//            // 保存全局变量方便其他地方调用
+//            GlobalValue.getInstance().saveGlobal(Constant.Key.BTADAPTER, btAdapter);
+            // 如果本地蓝牙没有开启，则开启
+            if (!btAdapter.isEnabled()) {
+                ToastUtil.showToast("正在开启蓝牙");
+                if (!mBtOpenSilent) {
+//                    // 我们通过startActivityForResult()方法发起的Intent将会在onActivityResult()回调方法中获取用户的选择，比如用户单击了Yes开启，
+//                    // 那么将会收到RESULT_OK的结果，
+//                    // 如果RESULT_CANCELED则代表用户不愿意开启蓝牙
+//                    Intent mIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//                    startActivityForResult(mIntent, REQUEST_BT_ENABLE);
+                } else { // 用enable()方法来开启，无需询问用户(无声息的开启蓝牙设备),这时就需要用到android.permission.BLUETOOTH_ADMIN权限。
+                    btAdapter.enable();
+                    isBtOk = true;
+                    ToastUtil.showToast("本地蓝牙已打开");
+                }
+            } else {
+                ToastUtil.showToast("本地蓝牙已打开");
+                isBtOk = true;
+            }
+        }
+    }
+
     private void startScan() {
-        btAdapter = (BluetoothAdapter) GlobalValue.getInstance().getGlobal(Constant.Key.BTADAPTER);
+//        btAdapter = (BluetoothAdapter) GlobalValue.getInstance().getGlobal(Constant.Key.BTADAPTER);
         if (btAdapter == null) {
             ToastUtil.showToast("蓝牙模块不可用");
             finish();
@@ -115,6 +172,11 @@ public class BtConfigActivity extends BaseActivity implements BGAOnRVItemClickLi
                 discoverOneDevice(device);
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 LogUtil.e(TAG, "搜索结束");
+            } else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) { // 蓝牙连接断开
+                if (printer != null) {
+                    printer.close();
+                }
+                ToastUtil.showToast("蓝牙连接已断开");
             }
         }
     };
@@ -139,7 +201,9 @@ public class BtConfigActivity extends BaseActivity implements BGAOnRVItemClickLi
 
     @Override
     protected void onDestroy() {
-        LogUtil.e(TAG, "==onDestroy===");
+        if (btAdapter.isDiscovering()) {
+            btAdapter.cancelDiscovery();
+        }
         deviceInfos.clear();
         // 注销广播接收器
         unregisterReceiver(mBroadcastReceiver);
@@ -151,10 +215,35 @@ public class BtConfigActivity extends BaseActivity implements BGAOnRVItemClickLi
         if (btAdapter.isDiscovering()) {
             btAdapter.cancelDiscovery();
         }
-        Intent intent = new Intent();
-        intent.putExtra(EXTRA_BLUETOOTH_DEVICE_NAME, mAdapter.getItem(position).getName());
-        intent.putExtra(EXTRA_BLUETOOTH_DEVICE_ADDRESS, mAdapter.getItem(position).getAddress());
-        setResult(Activity.RESULT_OK, intent);
-        finish();
+        btName = mAdapter.getItem(position).getName();
+        btAddress = mAdapter.getItem(position).getAddress();
+//        Intent intent = new Intent();
+//        intent.putExtra(EXTRA_BLUETOOTH_DEVICE_NAME, mAdapter.getItem(position).getName());
+//        intent.putExtra(EXTRA_BLUETOOTH_DEVICE_ADDRESS, mAdapter.getItem(position).getAddress());
+//        setResult(Activity.RESULT_OK, intent);
+//        finish();
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                String ret = printer.init(btAdapter, btAddress);
+                if ("00".equals(ret)) {
+//                    ToastUtil.showToast("打印机初始化成功");
+                    //TODO 打印机上线
+//                    printerOnline(btName, btAddress);
+                    JQEscPrinterManager.printerOnline(BtConfigActivity.this, btName, btAddress);
+//                    startService(new Intent(BtConfigActivity.this, PrintService.class));
+                    finish();
+                } else {
+                    ToastUtil.showToast(ErrorResult.getError(ret));
+                }
+                // 保存打印机对象到全局变量
+                GlobalValue.getInstance().saveGlobal(Constant.Key.PRINTER, printer);
+                // 注册蓝牙断开广播
+                IntentFilter filter = new IntentFilter();
+                filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);//蓝牙断开
+                registerReceiver(mBroadcastReceiver, filter);
+                return null;
+            }
+        }.execute();
     }
 }
