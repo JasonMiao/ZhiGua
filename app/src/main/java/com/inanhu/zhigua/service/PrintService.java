@@ -166,7 +166,11 @@ public class PrintService extends Service {
                 }
                 if (printCount > 1) {
                     // 延迟2秒打印
-
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
