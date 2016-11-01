@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
@@ -16,6 +17,7 @@ import com.inanhu.zhigua.R;
 import com.inanhu.zhigua.base.BaseActivity;
 import com.inanhu.zhigua.base.Constant;
 import com.inanhu.zhigua.base.GlobalValue;
+import com.inanhu.zhigua.base.ZhiGuaApp;
 import com.inanhu.zhigua.util.LogUtil;
 import com.inanhu.zhigua.util.MD5Util;
 import com.inanhu.zhigua.util.ToastUtil;
@@ -30,6 +32,8 @@ import org.json.simple.JSONValue;
 
 import java.util.Map;
 import java.util.Set;
+
+import printer.porting.JQEscPrinterManager;
 
 /**
  * Created by Jason on 2016/10/27.
@@ -63,6 +67,8 @@ public class LoginActivity extends BaseActivity {
             public void onClick(View v) {
                 final String username = etUsername.getText().toString().trim();
                 final String userpwd = etUserPwd.getText().toString().trim();
+//                final String username = "fengzhihua:0001";
+//                final String userpwd = "feng123456/";
                 final String roleType = rbRoleEmployee.isChecked() ? "0" : "1";
 
                 if (TextUtils.isEmpty(username) || TextUtils.isEmpty(userpwd)) {
@@ -137,5 +143,22 @@ public class LoginActivity extends BaseActivity {
         cookieManager.setCookie(url, cookie);//如果没有特殊需求，这里只需要将session id以"key=value"形式作为cookie即可
         String newCookie = cookieManager.getCookie(url);
         return TextUtils.isEmpty(newCookie) ? false : true;
+    }
+
+    private long firstTime = 0;
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        long secondTime = System.currentTimeMillis();
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (secondTime - firstTime < 2000) {
+                finish();
+            } else {
+                ToastUtil.showToast("再按一次退出");
+                firstTime = System.currentTimeMillis();
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

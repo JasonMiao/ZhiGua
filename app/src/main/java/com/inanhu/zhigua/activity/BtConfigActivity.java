@@ -21,6 +21,7 @@ import com.inanhu.zhigua.base.BaseActivity;
 import com.inanhu.zhigua.base.Constant;
 import com.inanhu.zhigua.base.ErrorResult;
 import com.inanhu.zhigua.base.GlobalValue;
+import com.inanhu.zhigua.base.ZhiGuaApp;
 import com.inanhu.zhigua.service.PrintService;
 import com.inanhu.zhigua.util.LogUtil;
 import com.inanhu.zhigua.util.ToastUtil;
@@ -80,7 +81,11 @@ public class BtConfigActivity extends BaseActivity implements BGAOnRVItemClickLi
             public void onClick(View v) {
                 if (printer != null && printer.isPrinterOpened()) {
                     if (printer.close()) {
+                        // 停止定时上送状态
+                        ZhiGuaApp.getInstance().getScheduledExecutor().shutdown();
                         ToastUtil.showToast("断开打印机成功");
+                        // 打印机离线
+                        JQEscPrinterManager.printerOffline();
                         finish();
                     }
                 }
@@ -229,6 +234,8 @@ public class BtConfigActivity extends BaseActivity implements BGAOnRVItemClickLi
                 if ("00".equals(ret)) {
 //                    ToastUtil.showToast("打印机初始化成功");
                     //TODO 打印机上线
+                    GlobalValue.getInstance().saveGlobal(BLUETOOTH_DEVICE_NAME, btName);
+                    GlobalValue.getInstance().saveGlobal(BLUETOOTH_DEVICE_ADDRESS, btAddress);
 //                    printerOnline(btName, btAddress);
                     JQEscPrinterManager.printerOnline(BtConfigActivity.this, btName, btAddress);
 //                    startService(new Intent(BtConfigActivity.this, PrintService.class));

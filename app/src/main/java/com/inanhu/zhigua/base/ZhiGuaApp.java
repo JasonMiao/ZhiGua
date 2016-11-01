@@ -9,6 +9,9 @@ import com.inanhu.zhigua.util.ToastUtil;
 import com.uzmap.pkg.openapi.APICloud;
 import com.uzmap.pkg.uzkit.request.APICloudHttpClient;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
 import printer.porting.JQEscPrinterManager;
 
 /**
@@ -18,6 +21,7 @@ public class ZhiGuaApp extends Application {
 
     private static ZhiGuaApp application;
     private static JQEscPrinterManager printer;
+    private static ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
     @Override
     public void onCreate() {
@@ -45,5 +49,9 @@ public class ZhiGuaApp extends Application {
 
     public static JQEscPrinterManager getPrinter() {
         return printer;
+    }
+
+    public static ScheduledExecutorService getScheduledExecutor() {
+        return executor;
     }
 }

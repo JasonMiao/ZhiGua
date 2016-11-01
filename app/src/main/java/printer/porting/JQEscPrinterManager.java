@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import com.inanhu.zhigua.activity.BtConfigActivity;
 import com.inanhu.zhigua.base.Constant;
 import com.inanhu.zhigua.base.GlobalValue;
+import com.inanhu.zhigua.base.ZhiGuaApp;
 import com.inanhu.zhigua.service.PrintService;
 import com.inanhu.zhigua.util.CommonUtils;
 import com.inanhu.zhigua.util.LogUtil;
@@ -329,6 +330,7 @@ public class JQEscPrinterManager {
                         intent.putExtra(Constant.Key.USERNAME, map.get("mqttUserName"));
                         intent.putExtra(Constant.Key.PASSWORD, map.get("mqttPassWord"));
                         context.startService(intent);
+                        // 参数一：唯一的通知标识；参数二：通知消息。
                     } else {
                     }
                 } catch (IOException e) {
@@ -383,10 +385,72 @@ public class JQEscPrinterManager {
                     LogUtil.e(TAG, "resultCode: " + map.get("resultCode"));
                     String resultCode = map.get("resultCode");
                     if (!TextUtils.isEmpty(resultCode) && "000000".equals(resultCode)) { // 状态上送成功
-                        GlobalValue.getInstance().deleteGlobal(BtConfigActivity.BLUETOOTH_DEVICE_NAME);
-                        GlobalValue.getInstance().deleteGlobal(BtConfigActivity.BLUETOOTH_DEVICE_ADDRESS);
+//                        GlobalValue.getInstance().deleteGlobal(BtConfigActivity.BLUETOOTH_DEVICE_NAME);
+//                        GlobalValue.getInstance().deleteGlobal(BtConfigActivity.BLUETOOTH_DEVICE_ADDRESS);
                     } else {
 
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (DocumentException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        APICloudHttpClient.instance().request(post);
+    }
+
+    /**
+     * 打印机状态上送
+     *
+     * @param isBatteryLow
+     * @param isCoverOpen
+     * @param isNoPaper
+     * @param isOverHeat
+     * @param isPrinting
+     */
+    public static void printerStatus(String isBatteryLow, String isCoverOpen, String isNoPaper, String isOverHeat, String isPrinting) {
+        // 获取当前连接的打印机（蓝牙）属性
+        String btName = (String) GlobalValue.getInstance().getGlobal(BtConfigActivity.BLUETOOTH_DEVICE_NAME);
+        String btAddress = (String) GlobalValue.getInstance().getGlobal(BtConfigActivity.BLUETOOTH_DEVICE_ADDRESS);
+        StringBuffer reqxml = new StringBuffer();
+        reqxml.append("<?xml version=\"1.0\" encoding=\"utf-16\"?>\n");
+        reqxml.append("<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\n");
+        reqxml.append("<soap:Body>\n");
+        reqxml.append("<reportPrinterStatusWS xmlns=\"http://ws.wechat.zgkj.com/\">\n");
+        reqxml.append("<arg0 xmlns=\"\">\n");
+        reqxml.append("<nonce>dcbf94fb-36e4-459f-a8b1-9228c103b0fa</nonce>\n");
+        reqxml.append("<signature>1755ce87efdcc37ad6da0625df33cbf34d52659e</signature>\n");
+        reqxml.append("<timestamp>1477473830545</timestamp>\n");
+        reqxml.append("<batteryLow>" + isBatteryLow + "</batteryLow>\n");
+        reqxml.append("<coverOpen>" + isCoverOpen + "</coverOpen>\n");
+        reqxml.append("<mac>" + btAddress +"</mac>\n");
+        reqxml.append("<noPaper>" + isNoPaper + "</noPaper>\n");
+        reqxml.append("<overHeat>" + isOverHeat + "</overHeat>\n");
+        reqxml.append("<printerName>" + btName + "</printerName>\n");
+        reqxml.append("<printing>" + isPrinting + "</printing>\n");
+        reqxml.append("</arg0>\n");
+        reqxml.append("</reportPrinterStatusWS>\n");
+        reqxml.append("</soap:Body>\n");
+        reqxml.append("</soap:Envelope>\n");
+        HttpParams params = new HttpParams();
+        params.setBody(reqxml.toString());
+        HttpPost post = new HttpPost(Constant.PRINTER_WS_URL, params);
+        post.addHeader("content-type", "text/xml;charset=utf-8");
+        post.setCallback(new RequestCallback() {
+            @Override
+            public void onFinish(HttpResult httpResult) {
+                LogUtil.e(TAG, "result: " + httpResult.data);
+                try {
+                    Map<String, String> map = CommonUtils.parseXML(httpResult.data);
+                    LogUtil.e(TAG, "resultCode: " + map.get("resultCode"));
+                    String resultCode = map.get("resultCode");
+                    if (!TextUtils.isEmpty(resultCode) && "000000".equals(resultCode)) { // 状态上送成功
+//                        GlobalValue.getInstance().deleteGlobal(BtConfigActivity.BLUETOOTH_DEVICE_NAME);
+//                        GlobalValue.getInstance().deleteGlobal(BtConfigActivity.BLUETOOTH_DEVICE_ADDRESS);
+                        LogUtil.e(TAG, "打印机状态上送成功");
+                    } else {
+                        LogUtil.e(TAG, "打印机状态上送失败");
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

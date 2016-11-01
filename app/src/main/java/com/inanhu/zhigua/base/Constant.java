@@ -13,6 +13,7 @@ public class Constant {
     public static final String START_URL = SERVER + "/zgskwechat"; // 加载的首页
 //    public static final String START_URL = SERVER + "/zgskwechat/WechatLoginAction_employeeLogin"; // 加载的首页
     public static final String PRINTER_LINK_URL = SERVER + "/zgskwechat/link_printer";
+    public static final String USER_LOGOUT = SERVER + "/zgskwechat/app_exit";
     public static final String PRINTER_WS_URL = SERVER + ":8086/zgskwxWS"; // 打印机webservice接口
     public static final String LOGIN_ACTION = SERVER + "/zgskwechat/WechatLoginAction_login";
 
