@@ -95,7 +95,7 @@ public class WebPageActivity extends ExternalActivity {
                 }
             }
             startActivity(new Intent(WebPageActivity.this, LoginActivity.class));
-//            finish();
+            finish();
             return true;
         }
         return false;
@@ -171,6 +171,9 @@ public class WebPageActivity extends ExternalActivity {
     protected void onDestroy() {
         // 注销广播接收器
         unregisterReceiver(mBroadcastReceiver);
+        // 清除缓存
+        CookieManager.getInstance().removeAllCookie();
+
         super.onDestroy();
     }
 }
