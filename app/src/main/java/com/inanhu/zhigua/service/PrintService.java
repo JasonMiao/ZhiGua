@@ -136,6 +136,9 @@ public class PrintService extends Service {
     }
 
     private void initMqtt2Client(String host, Long serverId, String clientTopic, String userName, String passWord) {
+        if (mqtt2Client != null) {
+            mqtt2Client.shutdown();
+        }
         mqtt2Client = new Mqtt2Client(host, serverId, clientTopic, userName, passWord);
         mqtt2Client.setMqttCallbackClentExtend(new MqttCallbackClentExtend() {
 
@@ -151,7 +154,7 @@ public class PrintService extends Service {
 
             @Override
             public void connectionLost(Throwable throwable) {
-//                LogUtil.e(TAG, "服务断开连接");
+                LogUtil.e(TAG, "服务断开连接");
             }
         });
     }
