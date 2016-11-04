@@ -14,6 +14,9 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.inanhu.zhigua.R;
 import com.inanhu.zhigua.adapter.DeviceInfoAdapter;
@@ -47,6 +50,10 @@ public class BtConfigActivity extends BaseActivity implements BGAOnRVItemClickLi
 //    // 济强打印机对象
 //    private JQEscPrinterManager printer = new JQEscPrinterManager();
 
+    RelativeLayout rlBtConnected;
+    TextView tvBtConnected;
+    Button btnBtDisconnect;
+
     BluetoothAdapter btAdapter = null;
     // 蓝牙是否可用
     private boolean isBtOk = true;
@@ -75,22 +82,53 @@ public class BtConfigActivity extends BaseActivity implements BGAOnRVItemClickLi
     private void initView() {
         showTopBarBack(true);
         setTopBarTitle("设备连接");
-        setTopBarRight("断开");
-        findViewById(R.id.id_topbar_right).setOnClickListener(new View.OnClickListener() {
+//        setTopBarRight("断开");
+//        findViewById(R.id.id_topbar_right).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (printer != null && printer.isPrinterOpened()) {
+//                    if (printer.close()) {
+//                        // 停止定时上送状态
+//                        ZhiGuaApp.getInstance().getScheduledExecutor().shutdown();
+//                        ToastUtil.showToast("断开打印机成功");
+//                        // 打印机离线
+//                        JQEscPrinterManager.printerOffline();
+//                        // 关闭消息客户端
+//                        PrintService.shutDownMqtt2Client();
+//                        finish();
+//                    }
+//                }
+//            }
+//        });
+        // 获取当前连接的打印机（蓝牙）属性
+        String btName = (String) GlobalValue.getInstance().getGlobal(BtConfigActivity.BLUETOOTH_DEVICE_NAME);
+//        String btAddress = (String) GlobalValue.getInstance().getGlobal(BtConfigActivity.BLUETOOTH_DEVICE_ADDRESS);
+        rlBtConnected = (RelativeLayout) findViewById(R.id.rl_bt_connected);
+        tvBtConnected = (TextView) findViewById(R.id.tv_bt_connected);
+        btnBtDisconnect = (Button) findViewById(R.id.btn_bt_disconnect);
+        btnBtDisconnect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (printer != null && printer.isPrinterOpened()) {
                     if (printer.close()) {
                         // 停止定时上送状态
                         ZhiGuaApp.getInstance().getScheduledExecutor().shutdown();
-                        ToastUtil.showToast("断开打印机成功");
                         // 打印机离线
                         JQEscPrinterManager.printerOffline();
-                        finish();
+                        // 关闭消息客户端
+                        PrintService.shutDownMqtt2Client();
+//                        finish();
+                        rlBtConnected.setVisibility(View.GONE);
                     }
                 }
             }
         });
+        if (!TextUtils.isEmpty(btName) && printer != null && printer.isPrinterOpened()) { // 当前有蓝牙连接
+            rlBtConnected.setVisibility(View.VISIBLE);
+            tvBtConnected.setText(btName);
+        } else {
+            rlBtConnected.setVisibility(View.GONE);
+        }
 
         recyclerView = (RecyclerView) findViewById(R.id.list_bluetooth);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));

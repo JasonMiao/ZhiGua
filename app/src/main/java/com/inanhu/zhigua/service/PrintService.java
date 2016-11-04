@@ -41,12 +41,18 @@ public class PrintService extends Service {
 
     private static final String TAG = "PrintService";
 
-    private Mqtt2Client mqtt2Client;
+    private static Mqtt2Client mqtt2Client;
+    public static void shutDownMqtt2Client() {
+        if (mqtt2Client != null) {
+            mqtt2Client.shutdown();
+        }
+    }
     private JQEscPrinterManager printer;
 
     // 打印消息缓存队列
     private static BlockingDeque<String> blockingDeque = new LinkedBlockingDeque<String>();
     private Thread thread;
+    ScheduledExecutorService executor;
 
     @Override
     public void onCreate() {
@@ -54,6 +60,7 @@ public class PrintService extends Service {
         LogUtil.e(TAG, "==onCreate===");
 
         printer = ZhiGuaApp.getPrinter();
+
 
         // 打印结算单线程
         thread = new Thread(new Runnable() {
@@ -75,7 +82,7 @@ public class PrintService extends Service {
 
         // 打印机状态上送
 //        final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        ScheduledExecutorService executor = ZhiGuaApp.getInstance().getScheduledExecutor();
+        executor = ZhiGuaApp.getInstance().getScheduledExecutor();
         executor.scheduleAtFixedRate(new Runnable() {
 
             @Override
@@ -136,9 +143,7 @@ public class PrintService extends Service {
     }
 
     private void initMqtt2Client(String host, Long serverId, String clientTopic, String userName, String passWord) {
-        if (mqtt2Client != null) {
-            mqtt2Client.shutdown();
-        }
+//        shutDownMqtt2Client();
         mqtt2Client = new Mqtt2Client(host, serverId, clientTopic, userName, passWord);
         mqtt2Client.setMqttCallbackClentExtend(new MqttCallbackClentExtend() {
 
@@ -277,7 +282,7 @@ public class PrintService extends Service {
                 if (bankListSize > 0) {
                     for (int k = 0; k < bankListSize; k++) {
                         JSONObject bankInfo = (JSONObject) JSONValue.parse(bankList.get(k).toString());
-                        printer.printText(JQPrinter.ALIGN.LEFT, false, "户名账号" + (k + 1) + "：" + bankInfo.get("name") + "   " + bankInfo.get("bankName") + "：" + bankInfo.get("bankAccount"));
+                        printer.printText(JQPrinter.ALIGN.LEFT, false, "户名账号" + (k + 1) + "：" + bankInfo.get("name") + "  " + bankInfo.get("bankName") + "：" + bankInfo.get("bankAccount"));
                         printer.feedEnter();
                     }
                 }
@@ -318,11 +323,12 @@ public class PrintService extends Service {
         super.onDestroy();
         stopForeground(true);// 停止前台服务--参数：表示是否移除之前的通知
         LogUtil.e(TAG, "==onDestroy===");
-        if (mqtt2Client != null) {
-            mqtt2Client.shutdown();
-        }
+        shutDownMqtt2Client();
         if (thread != null) {
             thread.stop();
+        }
+        if (executor != null) {
+            executor.shutdown();
         }
     }
 }

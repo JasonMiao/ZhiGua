@@ -65,67 +65,71 @@ public class LoginActivity extends BaseActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String username = etUsername.getText().toString().trim();
-                final String userpwd = etUserPwd.getText().toString().trim();
+                if (isNetConnected()) {
+                    final String username = etUsername.getText().toString().trim();
+                    final String userpwd = etUserPwd.getText().toString().trim();
 //                final String username = "fengzhihua:0001";
 //                final String userpwd = "feng123456/";
-                final String roleType = rbRoleEmployee.isChecked() ? "0" : "1";
+                    final String roleType = rbRoleEmployee.isChecked() ? "0" : "1";
 
-                if (TextUtils.isEmpty(username) || TextUtils.isEmpty(userpwd)) {
-                    ToastUtil.showToast("账号密码不能为空");
-                    return;
-                }
-                String loginUrl = Constant.LOGIN_ACTION
-                        + "?account=" + username
-                        + "&password=" + userpwd
-                        + "&roleType=" + roleType
-                        + "&isApp=" + isApp;
-                LogUtil.e(TAG, loginUrl);
-                HttpGet get = new HttpGet(loginUrl);
-                get.setCacheEntry(null);
-                get.setTimeout(10);
-                get.setCallback(new RequestCallback() {
-                    @Override
-                    public void onFinish(final HttpResult httpResult) {
-                        String data = httpResult.data;
-                        JSONObject resp = (JSONObject) JSONValue.parse(data);
-                        String resultCode = (String) resp.get("resultCode");
-                        LogUtil.e(TAG, "resultCode=" + resultCode);
-                        if ("000000".equals(resultCode)) {
-                            // 获取请求地址
-                            String url = (String) resp.get("url");
-                            LogUtil.e(TAG, "url=" + url);
-                            // 保存用户信息
-                            GlobalValue.getInstance().saveGlobal(Constant.Key.LOGIN_USERNAME, username);
-                            GlobalValue.getInstance().saveGlobal(Constant.Key.LOGIN_USERPWD, MD5Util.encrypt(userpwd));
-                            GlobalValue.getInstance().saveGlobal(Constant.Key.LOGIN_ROLE_TYPE, roleType);
-                            // 获取cookie
-                            Map<String, String> map = httpResult.headers;
-                            Set<String> set = map.keySet();
-                            for (String key : set) {
-                                LogUtil.e(TAG, "key=" + key + " value=" + map.get(key));
-                            }
-                            String cookie = map.get("Set-Cookie");
-                            LogUtil.e(TAG, "cookie:" + cookie);
-                            if (!TextUtils.isEmpty(cookie)) {
-                                // 同步cookie
-                                syncCookie(Constant.START_URL, cookie);
-                            }
-                            // 跳转主页
-                            startActivity(new Intent(LoginActivity.this, WebPageActivity.class).putExtra(Constant.Key.START_URL, Constant.START_URL + "/" + url));
-                            finish();
-                        } else {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    ToastUtil.showToast("用户名或密码错误");
-
-                                }
-                            });
-                        }
+                    if (TextUtils.isEmpty(username) || TextUtils.isEmpty(userpwd)) {
+                        ToastUtil.showToast("账号密码不能为空");
+                        return;
                     }
-                });
-                APICloudHttpClient.instance().request(get);
+                    String loginUrl = Constant.LOGIN_ACTION
+                            + "?account=" + username
+                            + "&password=" + userpwd
+                            + "&roleType=" + roleType
+                            + "&isApp=" + isApp;
+                    LogUtil.e(TAG, loginUrl);
+                    HttpGet get = new HttpGet(loginUrl);
+                    get.setCacheEntry(null);
+                    get.setTimeout(10);
+                    get.setCallback(new RequestCallback() {
+                        @Override
+                        public void onFinish(final HttpResult httpResult) {
+                            String data = httpResult.data;
+                            JSONObject resp = (JSONObject) JSONValue.parse(data);
+                            String resultCode = (String) resp.get("resultCode");
+                            LogUtil.e(TAG, "resultCode=" + resultCode);
+                            if ("000000".equals(resultCode)) {
+                                // 获取请求地址
+                                String url = (String) resp.get("url");
+                                LogUtil.e(TAG, "url=" + url);
+                                // 保存用户信息
+                                GlobalValue.getInstance().saveGlobal(Constant.Key.LOGIN_USERNAME, username);
+                                GlobalValue.getInstance().saveGlobal(Constant.Key.LOGIN_USERPWD, MD5Util.encrypt(userpwd));
+                                GlobalValue.getInstance().saveGlobal(Constant.Key.LOGIN_ROLE_TYPE, roleType);
+                                // 获取cookie
+                                Map<String, String> map = httpResult.headers;
+                                Set<String> set = map.keySet();
+                                for (String key : set) {
+                                    LogUtil.e(TAG, "key=" + key + " value=" + map.get(key));
+                                }
+                                String cookie = map.get("Set-Cookie");
+                                LogUtil.e(TAG, "cookie:" + cookie);
+                                if (!TextUtils.isEmpty(cookie)) {
+                                    // 同步cookie
+                                    syncCookie(Constant.START_URL, cookie);
+                                }
+                                // 跳转主页
+                                startActivity(new Intent(LoginActivity.this, WebPageActivity.class).putExtra(Constant.Key.START_URL, Constant.START_URL + "/" + url));
+                                finish();
+                            } else {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ToastUtil.showToast("用户名或密码错误");
+
+                                    }
+                                });
+                            }
+                        }
+                    });
+                    APICloudHttpClient.instance().request(get);
+                } else {
+                    ToastUtil.showToast("网络连接错误");
+                }
             }
         });
     }

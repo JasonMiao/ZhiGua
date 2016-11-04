@@ -16,7 +16,9 @@ import android.webkit.CookieSyncManager;
 import com.inanhu.zhigua.R;
 import com.inanhu.zhigua.base.Constant;
 import com.inanhu.zhigua.base.ZhiGuaApp;
+import com.inanhu.zhigua.service.PrintService;
 import com.inanhu.zhigua.util.LogUtil;
+import com.inanhu.zhigua.util.NetUtil;
 import com.inanhu.zhigua.util.ToastUtil;
 import com.inanhu.zhigua.widget.CustomProgress;
 import com.uzmap.pkg.openapi.ExternalActivity;
@@ -83,21 +85,28 @@ public class WebPageActivity extends ExternalActivity {
     @Override
     protected boolean shouldOverrideUrlLoading(WebViewProvider provider, String url) {
         LogUtil.e(TAG, "url:" + url);
-        if (Constant.PRINTER_LINK_URL.equals(url)) {
-            startActivity(new Intent(WebPageActivity.this, BtConfigActivity.class));
-            return true;
-        } else if (url.startsWith(Constant.SERVER + "/zgskwechat/WechatLoginAction_exit")) {
-            if (printer != null && printer.isPrinterOpened()) {
-                if (printer.close()) {
-                    JQEscPrinterManager.printerOffline();
-                    // 停止定时上送状态
-                    ZhiGuaApp.getInstance().getScheduledExecutor().shutdown();
+//        if (NetUtil.isConnected(this)) {
+            if (Constant.PRINTER_LINK_URL.equals(url)) {
+                startActivity(new Intent(WebPageActivity.this, BtConfigActivity.class));
+                return true;
+            } else if (url.startsWith(Constant.SERVER + "/zgskwechat/WechatLoginAction_exit")) {
+                if (printer != null && printer.isPrinterOpened()) {
+                    if (printer.close()) {
+                        JQEscPrinterManager.printerOffline();
+                        // 停止定时上送状态
+                        ZhiGuaApp.getInstance().getScheduledExecutor().shutdown();
+                        // 关闭消息客户端
+                        PrintService.shutDownMqtt2Client();
+                    }
                 }
+                startActivity(new Intent(WebPageActivity.this, LoginActivity.class));
+                finish();
+                return true;
             }
-            startActivity(new Intent(WebPageActivity.this, LoginActivity.class));
-            finish();
-            return true;
-        }
+//        } else {
+//            ToastUtil.showToast("网络已断开，请连接后再操作");
+//            return true;
+//        }
         return false;
     }
 
@@ -151,6 +160,8 @@ public class WebPageActivity extends ExternalActivity {
                         JQEscPrinterManager.printerOffline();
                         // 停止定时上送状态
                         ZhiGuaApp.getInstance().getScheduledExecutor().shutdown();
+                        // 关闭消息客户端
+                        PrintService.shutDownMqtt2Client();
                         finish();
 //                        System.exit(0);
                     }

@@ -8,6 +8,7 @@ import com.inanhu.zhigua.util.LogUtil;
 import com.inanhu.zhigua.util.ToastUtil;
 import com.uzmap.pkg.openapi.APICloud;
 import com.uzmap.pkg.uzkit.request.APICloudHttpClient;
+import com.zgone.zgonemqtt.client.Mqtt2Client;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

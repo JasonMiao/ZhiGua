@@ -12,6 +12,48 @@
         android:layout_height="45dp"/>
 
     <RelativeLayout
+        android:id="@+id/rl_bt_connected"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/iv_bt_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/icon_printer"/>
+
+        <TextView
+            android:id="@+id/tv_bt_connected"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/iv_bt_icon"
+            android:layout_marginLeft="15dp"
+            android:text="JQ-123456"
+            android:textSize="15sp"
+            android:textColor="@color/blue"/>
+
+        <Button
+            android:id="@+id/btn_bt_disconnect"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:layout_margin="10dp"
+            android:layout_alignParentRight="true"
+            style="@style/LoginBtn"
+            android:onClick="toCancel"
+            android:text="断开"/>
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1.0px"
+        android:background="@color/line_bj_color"/>
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
